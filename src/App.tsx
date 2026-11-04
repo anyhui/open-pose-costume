@@ -320,6 +320,7 @@ export default function App() {
     return () => observer.disconnect();
   }, [visible, limit, view, selectedId, panel]);
   const resultKinds = new Set(visible.map((item) => item.kind));
+  const showHero = view === 'all';
   const characterCategory = byView.some(
     (item) => item.category.id === category && item.kind === 'character',
   );
@@ -1049,25 +1050,27 @@ export default function App() {
         </header>
 
         <main className={`library-main library-main-${view}`} hidden={view === 'studio'}>
-          <section className="intro" aria-label={t.brand}>
-            <div className="intro-copy">
-              <p className="eyebrow">
-                <span />
-                {t.introLabel}
-              </p>
-              <h1>
-                {t.introA}
-                <br />
-                <em>{t.introB}</em>
-              </h1>
-              <p className="intro-description">{t.introText}</p>
-              <a className="intro-link" href="#collection">
-                {t.introLink}
-                <ArrowDown size={15} />
-              </a>
-            </div>
-            <HeroStudy lang={lang} />
-          </section>
+          {showHero && (
+            <section className="intro" aria-label={t.brand}>
+              <div className="intro-copy">
+                <p className="eyebrow">
+                  <span />
+                  {t.introLabel}
+                </p>
+                <h1>
+                  {t.introA}
+                  <br />
+                  <em>{t.introB}</em>
+                </h1>
+                <p className="intro-description">{t.introText}</p>
+                <a className="intro-link" href="#collection">
+                  {t.introLink}
+                  <ArrowDown size={15} />
+                </a>
+              </div>
+              <HeroStudy lang={lang} />
+            </section>
+          )}
           <div className="collection-summary">
             <span>
               <strong>{catalog?.stats.references.toLocaleString(lang) || '—'}</strong>{' '}
@@ -1462,9 +1465,6 @@ export default function App() {
             onSettings={() => setPanel('settings')}
             onRun={(references, prompt, options) => void runGeneration(references, prompt, options)}
             onCancel={cancelGeneration}
-            onReuse={async (file) => {
-              if (!(await selectReferenceFile(file, 'character'))) throw Error('characterInvalid');
-            }}
             notify={notify}
             onRestore={(record, references, source) => {
               if (generationJob?.status === 'loading') return;
